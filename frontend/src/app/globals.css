@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+/* ── UI UX PRO MAX — Modern Dark Cinema Design System ──────────────────── */
+/* Style: Dark Glassmorphism / Cinema Mobile                                */
+/* Palette: Deep Indigo + Space Black                                       */
+/* Typography: Cinzel (--font-cinzel) × Josefin Sans (--font-josefin)      */
+/* Fonts are loaded via next/font/google in layout.tsx — no @import needed  */
+
+@theme inline {
+  --color-background: #050505;
+  --color-foreground: #ededef;
+
+  /* Glassmorphism surface tokens */
+  --color-surface:         rgba(255, 255, 255, 0.03);
+  --color-surface-hover:   rgba(255, 255, 255, 0.05);
+  --color-border:          rgba(255, 255, 255, 0.08);
+  --color-border-focus:    rgba(99, 102, 241, 0.5);
+
+  /* Accent — Indigo spectrum */
+  --color-accent:          #6366f1;
+  --color-accent-bright:   #818cf8;
+  --color-accent-glow:     rgba(99, 102, 241, 0.3);
+
+  /* Muted text */
+  --color-muted:           #8a8f98;
+
+  /* Font families — resolved from next/font/google CSS vars set on <html> */
+  --font-display: var(--font-cinzel), serif;
+  --font-body:    var(--font-josefin), sans-serif;
+
+  /* Motion tokens (UI UX PRO MAX §7) */
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-micro: 150ms;
+  --duration-base:  280ms;
+  --duration-slow:  400ms;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: #050505;
+  color: #ededef;
+  font-family: var(--font-josefin), sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.01em;
+}
+
+/* ── Glass card surface ────────────────────────────────────────────────── */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  /* Subtle top-edge specular highlight */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 32px 64px rgba(0, 0, 0, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Glass input ───────────────────────────────────────────────────────── */
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #ededef;
+  font-family: var(--font-josefin), sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  transition:
+    border-color var(--duration-micro) var(--ease-expo-out),
+    background var(--duration-micro) var(--ease-expo-out),
+    box-shadow var(--duration-micro) var(--ease-expo-out);
+  outline: none;
+  width: 100%;
+  padding: 14px 16px;
+}
+
+.glass-input::placeholder {
+  color: rgba(138, 143, 152, 0.5);
+  letter-spacing: 0.02em;
+}
+
+.glass-input:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.glass-input:focus {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.glass-input::-webkit-inner-spin-button,
+.glass-input::-webkit-outer-spin-button {
+  opacity: 0.3;
+  filter: invert(1);
+}
+
+/* ── Label ─────────────────────────────────────────────────────────────── */
+
+.field-label {
+  display: block;
+  font-family: var(--font-josefin), sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a8f98;
+  margin-bottom: 8px;
+}
+
+/* ── Predict button ────────────────────────────────────────────────────── */
+
+.predict-btn {
+  position: relative;
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-josefin), sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #7c3aed 100%);
+  box-shadow:
+    0 8px 32px rgba(99, 102, 241, 0.35),
+    0 2px 8px rgba(99, 102, 241, 0.2),
+    0 0 0 1px rgba(99, 102, 241, 0.4) inset;
+  transition:
+    box-shadow var(--duration-base) var(--ease-expo-out),
+    filter var(--duration-base) var(--ease-expo-out);
+  overflow: hidden;
+}
+
+.predict-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+  border-radius: inherit;
+}
+
+.predict-btn:hover:not(:disabled) {
+  box-shadow:
+    0 12px 40px rgba(99, 102, 241, 0.5),
+    0 4px 16px rgba(99, 102, 241, 0.3),
+    0 0 0 1px rgba(99, 102, 241, 0.6) inset;
+  filter: brightness(1.08);
+}
+
+.predict-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ── Loading ring ──────────────────────────────────────────────────────── */
+
+@keyframes spin-ring {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.05); }
+}
+
+.loading-ring {
+  animation: spin-ring 1s linear infinite;
+}
+
+/* ── Result glow pulse ─────────────────────────────────────────────────── */
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.4; transform: scale(0.95); }
+  50%       { opacity: 0.7; transform: scale(1.05); }
+}
+
+.glow-orb {
+  animation: glow-breathe 3s ease-in-out infinite;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
