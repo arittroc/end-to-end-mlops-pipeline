@@ -1,0 +1,32 @@
+# Virtual environment — largest exclusion; keeps build context small
+house_price_env/
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Secrets — must never enter the image layer
+.env
+
+# Dev tooling
+.git/
+.gitignore
+.zenml/
+
+# MLflow local artifact cache — model is fetched at container runtime
+mlflow-artifacts/
+
+# Scripts only needed on the host
+setup_env.sh
+start_mlflow.sh
+remote_deploy.sh
+
+# Docs / editor noise
+*.md
+*.log
+.DS_Store

@@ -1,0 +1,138 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — House Price Prediction API
+#
+# Prerequisites on the server (skyie@192.168.29.100)
+# ────────────────────────────────────────────────────
+#  1. A .env file must exist at ~/house_price_production/.env
+#     (copy from .env.example and fill in Neon.tech credentials).
+#     It is NOT synced by remote_deploy.sh; create it manually once:
+#
+#       ssh skyie@192.168.29.100
+#       cp ~/house_price_production/.env.example \
+#          ~/house_price_production/.env
+#       nano ~/house_price_production/.env
+#
+#  2. The MLflow tracking server must be running on the host at port 5055.
+#     Start it with: bash ~/house_price_production/start_mlflow.sh
+#     The container reaches it via host.docker.internal:5055 (see extra_hosts).
+#
+#  3. No local Postgres container is defined here.
+#     The Neon.tech serverless PostgreSQL instance is the backend store and
+#     is referenced only by the MLflow server process — not by this container
+#     directly. The DATABASE_URL is forwarded so the container has it available
+#     if future code paths need direct DB access.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  house_price_api:
+    # ── Build ─────────────────────────────────────────────────────────────
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: house_price_api
+    image: house_price_api:latest
+
+    # ── Port mapping ──────────────────────────────────────────────────────
+    # Host port 8085 → container port 8085.
+    # 8085 was chosen to avoid clashing with the other live services on this
+    # server (Traefik, Grafana, etc.).
+    ports:
+      - "8085:8085"
+
+    # ── Volumes ───────────────────────────────────────────────────────────
+    # fastapi_model_cache is a named Docker volume that persists across
+    # container restarts and image rebuilds. It is mounted at /app/models,
+    # which is also the value of MLFLOW_TMP_DIR (see environment below).
+    # On first startup the MLflow client downloads the model artifact into
+    # this directory; on subsequent starts it reuses the cached copy.
+    volumes:
+      - fastapi_model_cache:/app/models
+
+    # ── Host networking bridge (Linux-specific) ───────────────────────────
+    # On Linux, "localhost" inside a container refers to the container itself,
+    # not the Docker host. extra_hosts injects a host.docker.internal →
+    # host-gateway mapping so the container can reach services (MLflow at
+    # port 5055) running directly on the server OS.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # ── Environment ───────────────────────────────────────────────────────
+    # env_file loads ALL variables from .env (Neon credentials, etc.) into
+    # the container's environment without hardcoding secrets in this file.
+    #
+    # The `environment:` block then applies container-specific overrides on
+    # top. MLFLOW_TRACKING_URI is overridden here because the value in .env
+    # uses "localhost" (valid for the host process) whereas the container
+    # must use "host.docker.internal" to cross the container network boundary.
+    env_file:
+      - .env
+
+    environment:
+      # ── MLflow server location ─────────────────────────────────────────
+      # Points at the MLflow tracking server running on the host OS.
+      # The "host.docker.internal" hostname is resolved via extra_hosts above.
+      MLFLOW_TRACKING_URI: "http://host.docker.internal:5055"
+
+      # ── MLflow model / artifact cache ─────────────────────────────────
+      # Redirects MLflow's temporary download directory to the named volume
+      # mount point so artifact downloads persist across container restarts.
+      MLFLOW_TMP_DIR: "/app/models"
+
+      # ── Remote PostgreSQL connection (Neon.tech) ───────────────────────
+      # Interpolated from .env at docker compose up time.
+      # Format: postgresql+psycopg2://user:password@host:5432/dbname?sslmode=require
+      DATABASE_URL: "${DATABASE_URL}"
+
+      # ── Application settings ───────────────────────────────────────────
+      MLFLOW_MODEL_NAME: "${MLFLOW_MODEL_NAME:-HousePriceModel}"
+      MLFLOW_EXPERIMENT_NAME: "${MLFLOW_EXPERIMENT_NAME:-house_price_prediction}"
+
+    # ── Health check ──────────────────────────────────────────────────────
+    # Pings the FastAPI /api/v1/health endpoint.
+    #
+    # start_period: 90s — generous grace window because:
+    #   - The FastAPI lifespan hook must connect to MLflow over the network.
+    #   - On first startup the MLflow client downloads model artifacts.
+    #   - ZenML / MLflow imports are heavy; cold-start JIT can be slow.
+    # After start_period, 5 consecutive failures mark the container unhealthy
+    # and trigger a restart (see restart policy below).
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-s", "http://localhost:8085/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 5
+
+    # ── Restart policy ────────────────────────────────────────────────────
+    # Restarts the container automatically after crashes or server reboots.
+    # "unless-stopped" means a manual `docker compose stop` is respected
+    # (unlike "always" which would restart even intentional stops).
+    restart: unless-stopped
+
+    # ── Resource limits (optional, uncomment to enforce) ─────────────────
+    # Protects other live services on the server from memory pressure.
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "1.0"
+    #       memory: "1536M"
+    #     reservations:
+    #       memory: "512M"
+
+    # ── Logging ───────────────────────────────────────────────────────────
+    # json-file driver with rotation prevents the log file from growing
+    # unbounded on a long-running server.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+# ── Named volumes ──────────────────────────────────────────────────────────
+# Docker manages the lifecycle of this volume independently of the container.
+# It survives `docker compose down` and is only removed with `down -v`.
+volumes:
+  fastapi_model_cache:
+    name: fastapi_model_cache
