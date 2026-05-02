@@ -175,3 +175,4 @@ id_ed25519
 # Local notes / scratch files
 scratch/
 sandbox/
+.gstack/

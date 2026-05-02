@@ -1,0 +1,110 @@
+{
+  "D:\\vibecoding\\OOP Ml project\\frontend\\eslint.config.mjs": {
+    "mtime": 1777744991.3798466,
+    "hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\next-env.d.ts": {
+    "mtime": 1777745508.205263,
+    "hash": "d0f8375ae1199dc7acd3977fc33b78b8"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\next.config.ts": {
+    "mtime": 1777744991.4951217,
+    "hash": "9b77af189a21a7a64e4bd7a426f64176"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\postcss.config.mjs": {
+    "mtime": 1777744991.4059193,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\src\\app\\layout.tsx": {
+    "mtime": 1777745313.9304116,
+    "hash": "23a96885be79516b549e34e6fc4e628d"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\src\\app\\page.tsx": {
+    "mtime": 1777745467.017434,
+    "hash": "29dd0c89e5ae8cbe3f7e4f638f25af1e"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\src\\lib\\utils.ts": {
+    "mtime": 1777745280.2594383,
+    "hash": "9a4cc6f9f3155ffdc1fa7c2c097f6429"
+  },
+  "D:\\vibecoding\\OOP Ml project\\src\\api.py": {
+    "mtime": 1777718697.387519,
+    "hash": "a380d01926ee2b8687f4b9cdb5955f27"
+  },
+  "D:\\vibecoding\\OOP Ml project\\src\\data_cleaning.py": {
+    "mtime": 1777716484.3856025,
+    "hash": "a57a8f132c90d0e0689144e623ab1c64"
+  },
+  "D:\\vibecoding\\OOP Ml project\\src\\data_ingestion.py": {
+    "mtime": 1777716401.3969343,
+    "hash": "f3eb42f325fd69ab9ac91ceaaed3754c"
+  },
+  "D:\\vibecoding\\OOP Ml project\\src\\pipeline.py": {
+    "mtime": 1777718166.8450308,
+    "hash": "12c63c440329160d5bc8bb65571e47f9"
+  },
+  "D:\\vibecoding\\OOP Ml project\\src\\__init__.py": {
+    "mtime": 1777716356.331368,
+    "hash": "4095fc8e4bec20c80ff151e1b7904f2d"
+  },
+  "D:\\vibecoding\\OOP Ml project\\docker-compose.yml": {
+    "mtime": 1777719177.2327125,
+    "hash": "eaf6a0387ca45f3467288e20517c54f4"
+  },
+  "D:\\vibecoding\\OOP Ml project\\requirements.txt": {
+    "mtime": 1777716124.9230852,
+    "hash": "323a64f81c345a28f6c49873d9dd8fa9"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\AGENTS.md": {
+    "mtime": 1777745098.122,
+    "hash": "9e09241799026ac05be315a2f0b50055"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\CLAUDE.md": {
+    "mtime": 1777745098.122503,
+    "hash": "5c27369b226fcf2be8a6cfe52224e767"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\README.md": {
+    "mtime": 1777744991.3588412,
+    "hash": "f15aaa42d5d299d091b1171097ea56ad"
+  },
+  "D:\\vibecoding\\OOP Ml project\\notes\\index.md": {
+    "mtime": 1777719581.372275,
+    "hash": "dd5456d5695352674a348972dfad2b4a"
+  },
+  "D:\\vibecoding\\OOP Ml project\\notes\\plans.md": {
+    "mtime": 1777719690.7754328,
+    "hash": "9e5ac2e8af65f23ea8f5e019a2bf8cff"
+  },
+  "D:\\vibecoding\\OOP Ml project\\notes\\progress.md": {
+    "mtime": 1777719758.708977,
+    "hash": "c44ff4905933c6d63a372be7694cefbe"
+  },
+  "D:\\vibecoding\\OOP Ml project\\notes\\tech_stack.md": {
+    "mtime": 1777719645.8335347,
+    "hash": "75e8886bd3ce0bb490ac64f185977c76"
+  },
+  "D:\\vibecoding\\OOP Ml project\\notes\\todays_session.md": {
+    "mtime": 1777719832.3771079,
+    "hash": "16d657e2d915efcf0319c1db387285af"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\public\\file.svg": {
+    "mtime": 1777744991.4151537,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\public\\globe.svg": {
+    "mtime": 1777744991.4306839,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\public\\next.svg": {
+    "mtime": 1777744991.4457304,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\public\\vercel.svg": {
+    "mtime": 1777744991.455892,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "D:\\vibecoding\\OOP Ml project\\frontend\\public\\window.svg": {
+    "mtime": 1777744991.466997,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  }
+}
