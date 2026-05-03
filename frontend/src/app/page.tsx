@@ -111,9 +111,11 @@ const FIELD_ICONS = {
   YearBuilt: CalendarDays,
 } as const
 
+type NumericFieldKey = Exclude<keyof FormState, 'Location'>
+
 // ── Single form field ─────────────────────────────────────────────────────
 interface FieldProps {
-  id: keyof FormState
+  id: NumericFieldKey
   label: string
   placeholder: string
   hint: string
