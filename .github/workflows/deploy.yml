@@ -15,5 +15,5 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          cp /home/skyie/house_price_production/.env .
+          cp /home/skyie/end-to-end-mlops-pipeline/.env .
           docker compose up -d --build
