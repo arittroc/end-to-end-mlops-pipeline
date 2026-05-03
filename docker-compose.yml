@@ -130,6 +130,24 @@ services:
         max-size: "20m"
         max-file: "5"
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Baked at build time — update and redeploy if the API URL changes
+        NEXT_PUBLIC_API_URL: "http://192.168.29.100:8085/api/v1/predict"
+    container_name: house_price_frontend
+    image: house_price_frontend:latest
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
