@@ -49,6 +49,7 @@ services:
     # this directory; on subsequent starts it reuses the cached copy.
     volumes:
       - fastapi_model_cache:/app/models
+      - /home/skyie/end-to-end-mlops-pipeline/mlflow-artifacts:/home/skyie/end-to-end-mlops-pipeline/mlflow-artifacts
 
     # ── Host networking bridge (Linux-specific) ───────────────────────────
     # On Linux, "localhost" inside a container refers to the container itself,

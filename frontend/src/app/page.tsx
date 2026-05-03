@@ -7,7 +7,7 @@ import {
   useMotionValue,
   useSpring,
 } from 'framer-motion'
-import { Home, Maximize2, Layers, CalendarDays, Sparkles, AlertCircle } from 'lucide-react'
+import { Home, Maximize2, Layers, CalendarDays, Sparkles, AlertCircle, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // ── Design tokens from UI UX PRO MAX (Modern Dark Cinema) ────────────────
@@ -20,6 +20,7 @@ const API_URL =
 
 // ── Types ─────────────────────────────────────────────────────────────────
 interface FormState {
+  Location: string
   OverallQual: string
   GrLivArea: string
   TotalBsmtSF: string
@@ -368,6 +369,8 @@ const FIELDS: Omit<FieldProps, 'value' | 'onChange' | 'index' | 'error'>[] = [
 function validate(form: FormState): Partial<Record<keyof FormState, string>> {
   const errors: Partial<Record<keyof FormState, string>> = {}
 
+  if (!form.Location) errors.Location = 'Required'
+
   const qual = parseInt(form.OverallQual)
   if (!form.OverallQual) errors.OverallQual = 'Required'
   else if (isNaN(qual) || qual < 1 || qual > 10) errors.OverallQual = 'Must be 1–10'
@@ -393,6 +396,7 @@ function validate(form: FormState): Partial<Record<keyof FormState, string>> {
 // ── Main page ─────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [form, setForm] = useState<FormState>({
+    Location: '',
     OverallQual: '',
     GrLivArea: '',
     TotalBsmtSF: '',
@@ -422,7 +426,8 @@ export default function HomePage() {
     setResult(null)
     setApiError(null)
 
-    const payload: Record<string, number> = {
+    const payload: Record<string, string | number> = {
+      Location: form.Location,
       OverallQual: parseInt(form.OverallQual),
       GrLivArea: parseInt(form.GrLivArea),
     }
@@ -497,7 +502,7 @@ export default function HomePage() {
             className="text-[13px] tracking-[0.04em]"
             style={{ color: '#8a8f98' }}
           >
-            End-to-End MLOps · Ames Housing Dataset
+            End-to-End MLOps · Indian Tech Hub Markets
           </p>
         </motion.div>
 
@@ -506,6 +511,51 @@ export default function HomePage() {
 
         {/* ── Form ── */}
         <form onSubmit={handleSubmit} noValidate className="px-8 py-6">
+          {/* Location selector */}
+          <motion.div
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING_CARD, delay: 0.3 }}
+            className="flex flex-col gap-2 mb-5"
+          >
+            <label htmlFor="Location" className="field-label flex items-center gap-2">
+              <MapPin size={11} className="text-indigo-400" aria-hidden />
+              City Market
+            </label>
+            <select
+              id="Location"
+              value={form.Location}
+              onChange={(e) => handleChange('Location', e.target.value)}
+              aria-invalid={!!errors.Location}
+              className={cn(
+                'glass-input',
+                errors.Location && 'border-red-500/50 focus:border-red-500/70'
+              )}
+              style={{ color: form.Location ? 'inherit' : '#8a8f98' }}
+            >
+              <option value="">Select a city...</option>
+              <option value="Gurgaon">Gurgaon (Delhi NCR)</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Kolkata">Kolkata</option>
+            </select>
+            <AnimatePresence mode="wait">
+              {errors.Location && (
+                <motion.p
+                  key="loc-error"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-1.5 text-[11px] text-red-400 font-medium"
+                  role="alert"
+                >
+                  <AlertCircle size={11} aria-hidden />
+                  {errors.Location}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
             {FIELDS.map((field, i) => (
               <FormField

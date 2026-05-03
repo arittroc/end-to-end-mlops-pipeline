@@ -293,31 +293,15 @@ class HousePriceFeatures(BaseModel):
 
     model_config = ConfigDict(
         populate_by_name=True,   # allow both alias and Python name in code
+        extra="allow",           # pass undeclared columns through to the model
         str_strip_whitespace=True,
         json_schema_extra={
             "example": {
-                "GrLivArea": 1500,
-                "OverallQual": 7,
-                "YearBuilt": 2003,
-                "TotalBsmtSF": 856.0,
-                "1stFlrSF": 856.0,
-                "2ndFlrSF": 854.0,
-                "GarageArea": 548.0,
-                "LotArea": 8450,
-                "OverallCond": 5,
-                "YearRemodAdd": 2003,
-                "BedroomAbvGr": 3,
-                "TotRmsAbvGrd": 8,
-                "Fireplaces": 0,
-                "GarageCars": 2,
-                "Neighborhood": "CollgCr",
-                "BldgType": "1Fam",
-                "HouseStyle": "2Story",
-                "ExterQual": "Gd",
-                "KitchenQual": "Gd",
-                "MSZoning": "RL",
-                "Foundation": "PConc",
-                "SaleCondition": "Normal",
+                "GrLivArea": 1850,
+                "OverallQual": 8,
+                "Location": "Gurgaon",
+                "YearBuilt": 2018,
+                "TotalBsmtSF": 0,
             }
         },
     )
@@ -327,14 +311,19 @@ class HousePriceFeatures(BaseModel):
         ...,
         gt=0,
         description="Above-grade (ground) living area in square feet.",
-        examples=[1500],
+        examples=[1850],
     )
     OverallQual: int = Field(
         ...,
         ge=1,
         le=10,
         description="Overall material and finish quality, rated 1 (very poor) to 10 (very excellent).",
-        examples=[7],
+        examples=[8],
+    )
+    Location: str = Field(
+        ...,
+        description="City market for Indian real estate pricing (Gurgaon, Bangalore, or Kolkata).",
+        examples=["Gurgaon"],
     )
 
     # ── Numerical features (optional) ─────────────────────────────────────
@@ -585,6 +574,17 @@ class HousePriceFeatures(BaseModel):
             raise ValueError(f"Rating must be between 1 and 10, got {int_val}")
         return int_val
 
+    @field_validator("Location", mode="before")
+    @classmethod
+    def validate_location(cls, value: Any) -> str:
+        allowed = {"Gurgaon", "Bangalore", "Kolkata"}
+        s = str(value).strip()
+        if s not in allowed:
+            raise ValueError(
+                f"Location must be one of {sorted(allowed)}, got {value!r}"
+            )
+        return s
+
     def to_dataframe(self) -> pd.DataFrame:
         """
         Convert this payload to a single-row DataFrame with original column names.
@@ -605,6 +605,9 @@ class HousePriceFeatures(BaseModel):
             by_alias=True,
             exclude_none=True,
         )
+        # Include any extra fields sent by the caller (undeclared Ames columns)
+        if self.model_extra:
+            raw.update({k: v for k, v in self.model_extra.items() if v is not None})
         return pd.DataFrame([raw])
 
 

@@ -54,8 +54,6 @@ Running the pipeline
     run_pipeline(data_path="data/train.csv")
 """
 
-from __future__ import annotations
-
 import argparse
 import logging
 import os
@@ -72,7 +70,6 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline as SklearnPipeline
 from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
-from typing_extensions import Annotated
 from zenml import pipeline, step
 from zenml.integrations.mlflow.flavors.mlflow_experiment_tracker_flavor import (
     MLFlowExperimentTrackerSettings,
@@ -295,7 +292,7 @@ def _build_preprocessor(
 @step
 def ingest_data_step(
     file_path: str,
-) -> Annotated[pd.DataFrame, "raw_dataset"]:
+) -> pd.DataFrame:
     """
     ZenML step — Data Ingestion.
 
@@ -343,7 +340,7 @@ def ingest_data_step(
 @step
 def clean_data_step(
     raw_df: pd.DataFrame,
-) -> Annotated[pd.DataFrame, "clean_dataset"]:
+) -> pd.DataFrame:
     """
     ZenML step — Data Cleaning.
 
@@ -409,10 +406,7 @@ def clean_data_step(
 )
 def train_model_step(
     clean_df: pd.DataFrame,
-) -> Tuple[
-    Annotated[SklearnPipeline, "trained_sklearn_pipeline"],
-    Annotated[Dict[str, float], "evaluation_metrics"],
-]:
+) -> Tuple[SklearnPipeline, Dict[str, float]]:
     """
     ZenML step — Feature Engineering + Model Training.
 
@@ -473,6 +467,13 @@ def train_model_step(
         If the target column is absent or the cleaned DataFrame is empty.
     """
     # ── Guard rails ───────────────────────────────────────────────────────
+    # NaN in categorical columns (e.g. PoolQC, Alley) means "no feature", not missing.
+    # Fill with "None" so OHE encodes them as a proper category.
+    cat_cols = clean_df.select_dtypes(include=["object", "category"]).columns
+    if len(cat_cols) > 0:
+        clean_df = clean_df.copy()
+        clean_df[cat_cols] = clean_df[cat_cols].fillna("None")
+
     if clean_df.empty:
         raise ValueError("train_model_step: received an empty DataFrame.")
     if CONFIG.target_column not in clean_df.columns:
@@ -564,7 +565,7 @@ def train_model_step(
 
         # Original-scale metrics (business-interpretable, in $).
         y_test_orig: np.ndarray = np.expm1(y_test.to_numpy())
-        y_pred_orig: np.ndarray = np.expm1(y_pred_log)
+        y_pred_orig: np.ndarray = np.expm1(np.clip(y_pred_log, 0, 20))
         rmse_orig: float = float(np.sqrt(mean_squared_error(y_test_orig, y_pred_orig)))
         mae_orig: float = float(mean_absolute_error(y_test_orig, y_pred_orig))
 
