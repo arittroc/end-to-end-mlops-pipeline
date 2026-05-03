@@ -1,0 +1,63 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# k8s/house-price-api.yaml
+#
+# Wires the Docker Compose FastAPI service (running on the host at port 8085)
+# into K3s Traefik so it is reachable at http://api.houseprice.local.
+#
+# Architecture
+# ─────────────
+#  K3s Traefik (port 80) → Ingress rule → Service → Endpoints → host:8085
+#
+# The Service has no pod selector — it is backed manually by an Endpoints
+# object that points directly at the K3s node IP (192.168.29.100), where
+# Docker maps the container port to the host.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Service ────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: house-price-api
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 8085
+      targetPort: 8085
+      protocol: TCP
+---
+# ── Endpoints — points at the Docker container on the host ────────────────
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: house-price-api
+  namespace: default
+subsets:
+  - addresses:
+      - ip: 192.168.29.100
+    ports:
+      - name: http
+        port: 8085
+        protocol: TCP
+---
+# ── Ingress — routes api.houseprice.local through K3s Traefik ────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: house-price-api-ingress
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: api.houseprice.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: house-price-api
+                port:
+                  number: 8085
