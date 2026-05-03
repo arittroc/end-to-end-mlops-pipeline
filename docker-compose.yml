@@ -34,6 +34,13 @@ services:
     container_name: house_price_api
     image: house_price_api:latest
 
+    # ── Traefik routing labels ────────────────────────────────────────────
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.house-price-api.rule=Host(`api.houseprice.local`)"
+      - "traefik.http.routers.house-price-api.entrypoints=web"
+      - "traefik.http.services.house-price-api.loadbalancer.server.port=8085"
+
     # ── Port mapping ──────────────────────────────────────────────────────
     # Host port 8085 → container port 8085.
     # 8085 was chosen to avoid clashing with the other live services on this
@@ -121,6 +128,13 @@ services:
     #     reservations:
     #       memory: "512M"
 
+    # ── Networks ──────────────────────────────────────────────────────────
+    # Joins the external Traefik network so the proxy can reach this service
+    # without a host-port binding being required.
+    networks:
+      - default
+      - traefik_proxy
+
     # ── Logging ───────────────────────────────────────────────────────────
     # json-file driver with rotation prevents the log file from growing
     # unbounded on a long-running server.
@@ -154,3 +168,11 @@ services:
 volumes:
   fastapi_model_cache:
     name: fastapi_model_cache
+
+# ── Networks ───────────────────────────────────────────────────────────────
+# traefik_proxy is the external Docker network created by the Traefik instance
+# already running on this server. Declaring it external means Docker will attach
+# to it rather than trying to create a new one.
+networks:
+  traefik_proxy:
+    external: true

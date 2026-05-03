@@ -15,7 +15,8 @@ const EXPO_OUT = [0.16, 1, 0.3, 1] as const
 const SPRING_CARD = { type: 'spring', damping: 22, stiffness: 90 } as const
 const SPRING_RESULT = { type: 'spring', damping: 18, stiffness: 70 } as const
 
-const API_URL = 'http://192.168.29.100:8085/api/v1/predict'
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8085/api/v1/predict'
 
 // ── Types ─────────────────────────────────────────────────────────────────
 interface FormState {
