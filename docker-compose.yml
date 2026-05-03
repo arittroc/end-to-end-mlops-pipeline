@@ -130,6 +130,24 @@ services:
         max-size: "20m"
         max-file: "5"
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3005:3000"
+    restart: unless-stopped
+
 # ── Named volumes ──────────────────────────────────────────────────────────
 # Docker manages the lifecycle of this volume independently of the container.
 # It survives `docker compose down` and is only removed with `down -v`.

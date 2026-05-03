@@ -1,0 +1,19 @@
+name: Deploy to Home Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server
+        run: |
+          cp /home/skyie/house_price_production/.env .
+          docker compose up -d --build

@@ -48,6 +48,7 @@ from fastapi import APIRouter, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from mlflow.tracking import MlflowClient
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -718,6 +719,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Prometheus metrics (/metrics endpoint) ─────────────────────────────────
+Instrumentator().instrument(app).expose(app)
 
 
 # ── Global exception handler ───────────────────────────────────────────────
