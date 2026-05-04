@@ -61,6 +61,7 @@ MLFLOW_EXPERIMENT_NAME: str = os.getenv(
     "MLFLOW_EXPERIMENT_NAME", "house_price_prediction"
 )
 APP_VERSION: str = "1.0.0"
+INR_RATE: int = 83
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -619,10 +620,15 @@ class PredictionResponse(BaseModel):
         description="Predicted sale price in US dollars (expm1 of model output).",
         examples=[208500.0],
     )
+    predicted_price_inr: float = Field(
+        ...,
+        description="Predicted sale price in Indian Rupees (USD x 83).",
+        examples=[17305500.0],
+    )
     predicted_price_formatted: str = Field(
         ...,
-        description="Human-readable price string.",
-        examples=["$208,500.00"],
+        description="Human-readable price string in INR.",
+        examples=["₹1.73 Cr"],
     )
     model_uri: Optional[str] = Field(
         None,
@@ -883,12 +889,15 @@ async def predict(payload: HousePriceFeatures) -> PredictionResponse:
 
     # ── Format and return ──────────────────────────────────────────────────
     predicted_price: float = float(predictions[0])
+    predicted_price_inr: float = round(predicted_price * INR_RATE, 2)
+    cr: float = predicted_price_inr / 1e7
 
-    logger.info("predict: predicted_price_usd=%.2f", predicted_price)
+    logger.info("predict: predicted_price_usd=%.2f  inr=%.0f", predicted_price, predicted_price_inr)
 
     return PredictionResponse(
         predicted_price_usd=round(predicted_price, 2),
-        predicted_price_formatted=f"${predicted_price:,.2f}",
+        predicted_price_inr=predicted_price_inr,
+        predicted_price_formatted=f"₹{cr:.2f} Cr",
         model_uri=ModelRegistry._model_uri,
     )
 

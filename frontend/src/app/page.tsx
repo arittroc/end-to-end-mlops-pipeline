@@ -29,6 +29,7 @@ interface FormState {
 
 interface PredictResponse {
   predicted_price_usd: number
+  predicted_price_inr: number
   predicted_price_formatted: string
   model_uri: string | null
 }
@@ -246,17 +247,12 @@ function LoadingRing() {
 function usePriceCounter(targetPrice: number) {
   const raw = useMotionValue(0)
   const spring = useSpring(raw, { damping: 28, stiffness: 55 })
-  const [display, setDisplay] = useState('$0')
+  const [display, setDisplay] = useState('₹0')
 
   useEffect(() => {
     const unsub = spring.on('change', (v) => {
-      setDisplay(
-        new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          maximumFractionDigits: 0,
-        }).format(v)
-      )
+      const cr = v / 1e7
+      setDisplay(`₹${cr.toFixed(2)} Cr`)
     })
     return unsub
   }, [spring])
@@ -270,7 +266,7 @@ function usePriceCounter(targetPrice: number) {
 
 // ── Result display ────────────────────────────────────────────────────────
 function PriceResult({ data }: { data: PredictResponse }) {
-  const displayPrice = usePriceCounter(data.predicted_price_usd)
+  const displayPrice = usePriceCounter(data.predicted_price_inr)
 
   return (
     <motion.div
@@ -314,6 +310,16 @@ function PriceResult({ data }: { data: PredictResponse }) {
         >
           {displayPrice}
         </p>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-1 text-[12px] tracking-wide"
+          style={{ color: 'rgba(138,143,152,0.6)' }}
+        >
+          ≈ ${data.predicted_price_usd.toLocaleString('en-US', { maximumFractionDigits: 0 })} USD
+        </motion.p>
 
         {data.model_uri && (
           <motion.p
